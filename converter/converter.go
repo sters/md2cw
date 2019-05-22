@@ -62,14 +62,21 @@ func (c *confluenceRenderer) RenderNode(w io.Writer, node *blackfriday.Node, ent
 			fmt.Fprintf(w, "[%s|%s]", c.buffring.buffer, node.LinkData.Destination)
 			c.buffring.buffer = ""
 		}
+	case blackfriday.Code:
+		fmt.Fprintf(w, "{{%s}}", node.Literal)
+	case blackfriday.CodeBlock:
+		fmt.Fprintf(w, "\n{code}\n%s\n{code}\n\n", strings.TrimSpace(string(node.Literal)))
 	case blackfriday.Text:
 		if c.buffring.enable {
 			c.buffring.buffer += string(node.Literal)
 			break
 		}
 		fmt.Fprintf(w, "%s", node.Literal)
+
+	case blackfriday.Document:
+		// do nothing.
 	default:
-		fmt.Fprintf(os.Stderr, "NodeType = %s is not supported", node.Type)
+		fmt.Fprintf(os.Stderr, "NodeType = %s is not supported\n", node.Type)
 	}
 	return blackfriday.GoToNext
 }

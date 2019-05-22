@@ -53,6 +53,11 @@ func TestConvert(t *testing.T) {
 
 		// list with link
 		{"list with link", "- [foo](https://github.com/)\n- [foo](https://github.com/)", "* [foo|https://github.com/]\n* [foo|https://github.com/]"},
+
+		// code
+		{"code", "foo `bar` baz", "foo {{bar}} baz"},
+		{"code triple-quote", "foo ```bar``` baz", "foo {{bar}} baz"},
+		{"code block", "foo\n```\nbar\n```\nbaz", "foo\n\n{code}\nbar\n{code}\n\nbaz"},
 	}
 
 	for _, test := range tests {
