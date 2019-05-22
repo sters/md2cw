@@ -46,10 +46,13 @@ func TestConvert(t *testing.T) {
 		{"number-list", "1. foo\n    - foo\n1. foo", "# foo\n#* foo\n# foo"},
 
 		// hr
-		{"hr", "foo\n\n----\n\nfoo", "foo\n----\nfoo"},
+		{"hr", "foo\n\n----\n\nfoo", "foo\n\n----\n\nfoo"},
 
 		// link
 		{"link", "[foo](https://github.com/)", "[foo|https://github.com/]"},
+
+		// list with link
+		{"list with link", "- [foo](https://github.com/)\n- [foo](https://github.com/)", "* [foo|https://github.com/]\n* [foo|https://github.com/]"},
 	}
 
 	for _, test := range tests {

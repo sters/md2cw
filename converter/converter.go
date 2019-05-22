@@ -3,6 +3,7 @@ package converter
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	"github.com/russross/blackfriday/v2"
@@ -29,6 +30,7 @@ type buffering struct {
 func (c *confluenceRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering bool) blackfriday.WalkStatus {
 	switch node.Type {
 	case blackfriday.Heading:
+		fmt.Fprintf(w, "\n")
 		if entering {
 			fmt.Fprintf(w, "h%d. ", node.HeadingData.Level)
 		} else {
@@ -44,8 +46,16 @@ func (c *confluenceRenderer) RenderNode(w io.Writer, node *blackfriday.Node, ent
 		} else {
 			c.listPrefix = c.listPrefix[:len(c.listPrefix)-1]
 		}
+	case blackfriday.Item: // item means list-item
+		if entering && len(c.listPrefix) > 0 {
+			fmt.Fprintf(w, "%s ", strings.Join(c.listPrefix, ""))
+		}
+	case blackfriday.Paragraph: // paragraph like a <p>
+		if !entering {
+			fmt.Fprintf(w, "\n")
+		}
 	case blackfriday.HorizontalRule:
-		fmt.Fprintf(w, "----\n")
+		fmt.Fprintf(w, "\n----\n\n")
 	case blackfriday.Link:
 		c.buffring.enable = entering
 		if !entering {
@@ -57,11 +67,9 @@ func (c *confluenceRenderer) RenderNode(w io.Writer, node *blackfriday.Node, ent
 			c.buffring.buffer += string(node.Literal)
 			break
 		}
-
-		if len(c.listPrefix) > 0 {
-			fmt.Fprintf(w, "%s ", strings.Join(c.listPrefix, ""))
-		}
-		fmt.Fprintf(w, "%s\n", node.Literal)
+		fmt.Fprintf(w, "%s", node.Literal)
+	default:
+		fmt.Fprintf(os.Stderr, "NodeType = %s is not supported", node.Type)
 	}
 	return blackfriday.GoToNext
 }
