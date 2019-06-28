@@ -1,16 +1,23 @@
+TOOL_COMMAND_NAME := md2cw
+TOOL_COMMAND_DIR  := cmd/${TOOL_COMMAND_NAME}
+TOOL_COMMAND_MAIN := ${TOOL_COMMAND_DIR}/main.go
+TOOL_PACKAGE      := github.com/sters/${TOOL_COMMAND_NAME}/${TOOL_COMMAND_DIR}
 
-CMD_PACKAGE := github.com/sters/md2cw/cmd/md2cw
-GO_ENV := GO111MODULE=on CGO_ENABLED=0
 BUILD_DIR := ./build
+BUILD_PATH := ${BUILD_DIR}/${TOOL_COMMAND_NAME}
 
-.PHONY: init tidy test build install
+GO_ENV := GO111MODULE=on CGO_ENABLED=0
+
+.PHONY: init tidy test build install run
 init: 
-	${GO_ENV} go mod init
+	@${GO_ENV} go mod init
 tidy: 
-	${GO_ENV} go mod tidy
+	@${GO_ENV} go mod tidy
 test: 
-	${GO_ENV} go test -v ./...
+	@${GO_ENV} CGO_ENABLED=1 go test -v -race -cover ./...
 build: 
-	${GO_ENV} go build -o $(BUILD_DIR)/md2cw cmd/main.go
+	@${GO_ENV} go build -o ${BUILD_PATH} ${TOOL_COMMAND_MAIN}
 install:
-	${GO_ENV} go install ${CMD_PACKAGE}
+	@${GO_ENV} go install ${TOOL_PACKAGE}
+run:
+	@${GO_ENV} go run ${TOOL_PACKAGE}
