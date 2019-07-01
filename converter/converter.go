@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/russross/blackfriday/v2"
+	"github.com/russross/blackfriday"
 )
 
 // Convert from markdown syntax to confluence wiki syntax
