@@ -75,6 +75,7 @@ func (c *confluenceRenderer) RenderNode(w io.Writer, node *blackfriday.Node, ent
 		fmt.Fprintf(w, "%s", node.Literal)
 
 	case blackfriday.Table:
+		fmt.Fprintf(w, "\n")
 	case blackfriday.TableRow:
 		if !entering {
 			fmt.Fprintf(w, "%s\n", c.buffring.tableCellSplitter)
