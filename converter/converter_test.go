@@ -58,6 +58,13 @@ func TestConvert(t *testing.T) {
 		{"code", "foo `bar` baz", "foo {{bar}} baz"},
 		{"code triple-quote", "foo ```bar``` baz", "foo {{bar}} baz"},
 		{"code block", "foo\n```\nbar\n```\nbaz", "foo\n\n{code}\nbar\n{code}\n\nbaz"},
+
+		// table
+		{
+			"table",
+			"|head-1|head-2|\n|-----|-----|\n|foo  |bar  |\n|foooo|baaar|",
+			"||head-1||head-2||\n|foo|bar|\n|foooo|baaar|",
+		},
 	}
 
 	for _, test := range tests {

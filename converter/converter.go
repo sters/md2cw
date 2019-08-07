@@ -23,8 +23,9 @@ type confluenceRenderer struct {
 }
 
 type buffering struct {
-	enable bool
-	buffer string
+	enable            bool
+	buffer            string
+	tableCellSplitter string
 }
 
 func (c *confluenceRenderer) RenderNode(w io.Writer, node *blackfriday.Node, entering bool) blackfriday.WalkStatus {
@@ -70,6 +71,24 @@ func (c *confluenceRenderer) RenderNode(w io.Writer, node *blackfriday.Node, ent
 		if c.buffring.enable {
 			c.buffring.buffer += string(node.Literal)
 			break
+		}
+		fmt.Fprintf(w, "%s", node.Literal)
+
+	case blackfriday.Table:
+	case blackfriday.TableRow:
+		if !entering {
+			fmt.Fprintf(w, "%s\n", c.buffring.tableCellSplitter)
+		}
+		c.buffring.tableCellSplitter = ""
+	case blackfriday.TableHead, blackfriday.TableBody:
+		// do nothing.
+	case blackfriday.TableCell:
+		if entering {
+			c.buffring.tableCellSplitter = "|"
+			if node.TableCellData.IsHeader {
+				c.buffring.tableCellSplitter = "||"
+			}
+			fmt.Fprintf(w, "%s", c.buffring.tableCellSplitter)
 		}
 		fmt.Fprintf(w, "%s", node.Literal)
 
